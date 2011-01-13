@@ -1,0 +1,46 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Install file for d7permissions module.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function d7permissions_schema() {
+  $schema['d7permissions_role_order'] = array(
+    'description' => t('Stores role order.'),
+    'fields' => array(
+      'rid' => array(
+        'description' => t('Role ID.'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE),
+      'weight' => array(
+        'description' => t('Role weight.'),
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => '0'),
+      ),
+    'primary key' => array('rid'),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function d7permissions_install() {
+  // Create tables
+  drupal_install_schema('d7permissions');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function d7permissions_uninstall() {
+  // Drop tables
+  drupal_uninstall_schema('d7permissions');
+}

@@ -1,0 +1,6 @@
+; $Id$
+name = d7permissions
+description = Allows for drag-and-drop ordering of roles and improvements on the permissions administration page.
+core = 6.x
+dependencies[] = jquery_update
+; version 0.1

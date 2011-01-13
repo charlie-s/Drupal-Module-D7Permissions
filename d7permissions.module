@@ -1,0 +1,70 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_menu().
+ */
+function d7permissions_menu() {
+  $items = array();
+  $items['admin/user/d7permissions'] = array(
+    'title' => t('D7Permissions'),
+    'description' => 'Determine access to features by selecting permissions for roles.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('d7permissions_admin_perm'),
+    'access arguments' => array('administer permissions'),
+    'file' => 'd7permissions.admin.inc',
+  );
+  $items['admin/user/d7permissions/edit'] = array(
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'title' => t('Permissions'),
+    'description' => 'Determine access to features by selecting permissions for roles.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('d7permissions_admin_perm'),
+    'access arguments' => array('administer permissions'),
+    'file' => 'd7permissions.admin.inc',
+  );
+		$items['admin/user/d7permissions/order'] = array(
+		  'type' => MENU_LOCAL_TASK,
+		  'title' => t('Role Order'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('d7permissions_role_order'),
+  		'access arguments' => array('administer permissions'),
+    'file' => 'd7permissions.admin.inc',
+		);
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function d7permissions_theme() {
+  return array(
+    'd7permissions_admin_perm' => array(
+      'arguments' => array('form' => NULL),
+      'file' => 'd7permissions.admin.inc',
+    ),
+    'd7permissions_role_order' => array(
+      'arguments' => array('form' => NULL),
+      'file' => 'd7permissions.admin.inc',
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function d7permissions_init() {
+  // check that current roles exist in our d7permissions table, default weight=0
+  $results = db_query("SELECT rid,name FROM {role}");
+  while ($row = db_fetch_object($results)) {
+    $sub_results = db_result(db_query("SELECT COUNT(weight) FROM {d7permissions_role_order} WHERE rid = %d", $row->rid));
+    if ($sub_results == 0) {
+      $record = array(
+        'rid' => $row->rid,
+        'weight' => '0',
+      );
+      drupal_write_record('d7permissions_role_order', $record);
+    }
+  }
+  $results = db_query("UPDATE {system} SET weight = 99 WHERE name = 'd7permissions'");
+}
